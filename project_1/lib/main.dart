@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import './question.dart';
-import './answer.dart';
+import './quiz.dart';
+import './result.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,24 +15,49 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final questions = const [
+  final _questions = const [
     {
       'questionText': 'What\'s your favorite color?',
-      'answers': ['Black', 'Red', 'Green', 'White'],
+      'answers': [
+        {'text': 'Black', 'score': 5},
+        {'text': 'Red', 'score': 10},
+        {'text': 'Green', 'score': 8},
+        {'text': 'Blue', 'score': 7},
+      ],
     },
     {
       'questionText': 'What\'s your favorite animal?',
-      'answers': ['Dog', 'Rabbit', 'Snake', 'Cat'],
+      'answers': [
+        {'text': 'Dog', 'score': 10},
+        {'text': 'Cat', 'score': 1},
+        {'text': 'Tiger', 'score': 5},
+        {'text': 'Lion', 'score': 7},
+      ],
     },
     {
       'questionText': 'What\'s your favorite instructor?',
-      'answers': ['Me', 'Me', 'Me', 'Me'],
+      'answers': [
+        {'text': 'Me', 'score': 1},
+        {'text': 'Me', 'score': 1},
+        {'text': 'Me', 'score': 1},
+        {'text': 'Me', 'score': 1},
+      ],
     },
   ];
 
   var _questionIdx = 0;
+  var _totalScore = 0;
 
-  void _answerQuestion() {
+  void _resetQuiz() {
+    setState(() {
+      _questionIdx = 0;
+      _totalScore = 0;
+    });
+  }
+
+  void _answerQuestion(int score) {
+    _totalScore += score;
+
     setState(() {
       _questionIdx += 1;
     });
@@ -45,21 +70,13 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: Text('My First App'),
         ),
-        body: _questionIdx < questions.length
-            ? Column(
-                children: [
-                  Question(
-                    questions[_questionIdx]['questionText'],
-                  ),
-                  ...(questions[_questionIdx]['answers'] as List<String>)
-                      .map((answer) {
-                    return Answer(_answerQuestion, answer);
-                  }).toList()
-                ],
+        body: _questionIdx < _questions.length
+            ? Quiz(
+                answerQuestion: _answerQuestion,
+                questions: _questions,
+                questionIndex: _questionIdx,
               )
-            : Center(
-                child: Text('You did it'),
-              ),
+            : Result(_totalScore, _resetQuiz),
       ),
     );
   }
